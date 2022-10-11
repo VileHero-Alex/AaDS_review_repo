@@ -2,10 +2,9 @@
 #include <iomanip>
 #include <iostream>
 
-long double a[3 * (int)1e5 + 100];
-long double pref[3 * (int)1e5 + 100];
-
 int main() {
+  long double* a = new long double[3 * (int)1e5 + 100];
+  long double* pref = new long double[3 * (int)1e5 + 100];
   pref[0] = 0;
   int n, q;
   std::cin >> n;
@@ -22,4 +21,6 @@ int main() {
                                          ((long double)r + 1 - (long double)l))
               << "\n";
   }
+  delete[] a;
+  delete[] pref;
 }
