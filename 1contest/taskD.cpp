@@ -1,55 +1,102 @@
 #include <algorithm>
-#include <deque>
 #include <iostream>
+#include <string>
 
 struct SuperQueue {
-  std::deque<int> fr, bck;
-  SuperQueue() {}
-  void CheckAmount() {
-    while (fr.size() < bck.size()) {
-      int cur = bck.front();
-      bck.pop_front();
-      fr.push_back(cur);
-    }
+  int* queue;
+  int* mins;
+  int q_l, q_r, mn_l, mn_r;
+
+  SuperQueue() {
+    q_l = 0;
+    q_r = 0;
+    mn_l = 0;
+    mn_r = 0;
+    queue = new int[(int)(2e5) + 100];
+    mins = new int[(int)(2e5) + 100];
   }
-  void PushLast(int val) {
-    CheckAmount();
-    bck.push_back(val);
-    CheckAmount();
+
+  ~SuperQueue() {
+    delete[] queue;
+    delete[] mins;
   }
-  void PushMiddle(int val) {
-    CheckAmount();
-    if (fr.size() == bck.size()) {
-      fr.push_back(val);
-    } else {
-      bck.push_front(val);
+
+  int Size() const { return (q_r - q_l); }
+
+  void Enqueue() {
+    int x;
+    std::cin >> x;
+    queue[q_r] = x;
+    ++q_r;
+    while (mn_l < mn_r && mins[mn_r - 1] > x) {
+      --mn_r;
     }
-    CheckAmount();
+    mins[mn_r] = x;
+    ++mn_r;
+    std::cout << "ok\n";
+  }
+
+  void Dequeue() {
+    if (Size() == 0) {
+      std::cout << "error\n";
+      return;
+    }
+    if (queue[q_l] == mins[mn_l]) {
+      ++mn_l;
+    }
+    std::cout << queue[q_l] << "\n";
+    ++q_l;
+  }
+
+  void Front() const {
+    if (Size() == 0) {
+      std::cout << "error\n";
+      return;
+    }
+    std::cout << queue[q_l] << "\n";
+  }
+
+  void Clear() {
+    q_l = q_r = 0;
+    mn_l = mn_r = 0;
+    std::cout << "ok\n";
+  }
+
+  void FindMin() const {
+    if (Size() == 0) {
+      std::cout << "error\n";
+      return;
+    }
+    std::cout << mins[mn_l] << "\n";
   }
 };
 
 int main() {
   std::cin.tie(0);
   std::cout.tie(0);
-  int n;
-  std::cin >> n;
   SuperQueue curr_queue;
-  for (int q = 0; q < n; ++q) {
-    char v;
-    std::cin >> v;
-    if (v == '-') {
-      int ans = curr_queue.fr.front();
-      curr_queue.fr.pop_front();
-      curr_queue.CheckAmount();
-      std::cout << ans << "\n";
-    } else {
-      int num;
-      std::cin >> num;
-      if (v == '*') {
-        curr_queue.PushMiddle(num);
-      } else {
-        curr_queue.PushLast(num);
-      }
+  int q;
+  std::cin >> q;
+  std::string t;
+  for (int que = 0; que < q; ++que) {
+    std::cin >> t;
+    if (t == "enqueue") {
+      curr_queue.Enqueue();
+    }
+    if (t == "dequeue") {
+      curr_queue.Dequeue();
+    }
+    if (t == "front") {
+      curr_queue.Front();
+    }
+    if (t == "size") {
+      std::cout << curr_queue.Size() << "\n";
+    }
+    if (t == "clear") {
+      curr_queue.Clear();
+    }
+    if (t == "min") {
+      curr_queue.FindMin();
     }
   }
 }
