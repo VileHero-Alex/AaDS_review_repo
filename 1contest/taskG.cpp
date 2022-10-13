@@ -3,8 +3,9 @@
 #include <iostream>
 
 int main() {
-  long double* a = new long double[3 * (int)1e5 + 100];
-  long double* pref = new long double[3 * (int)1e5 + 100];
+  const int kSz = 3 * (int)1e5 + 100;
+  long double* a = new long double[kSz];
+  long double* pref = new long double[kSz];
   pref[0] = 0;
   int n, q;
   std::cin >> n;
