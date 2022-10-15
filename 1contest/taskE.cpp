@@ -2,39 +2,40 @@
 #include <iostream>
 #include <string>
 
-struct SuperQueue {
-  const int kSz = (int)(2e5) + 100;
+class SuperQueue {
+ private:
+  const int kKSz = (int)(2e5) + 100;
+  int* queue_;
+  int* mins_;
+  int q_l_, q_r_, mn_l_, mn_r_;
 
-  int* queue;
-  int* mins;
-  int q_l, q_r, mn_l, mn_r;
-
+ public:
   SuperQueue() {
-    q_l = 0;
-    q_r = 0;
-    mn_l = 0;
-    mn_r = 0;
-    queue = new int[kSz];
-    mins = new int[kSz];
+    q_l_ = 0;
+    q_r_ = 0;
+    mn_l_ = 0;
+    mn_r_ = 0;
+    queue_ = new int[kKSz];
+    mins_ = new int[kKSz];
   }
 
   ~SuperQueue() {
-    delete[] queue;
-    delete[] mins;
+    delete[] queue_;
+    delete[] mins_;
   }
 
-  int Size() const { return (q_r - q_l); }
+  int Size() const { return (q_r_ - q_l_); }
 
   void Enqueue() {
     int x;
     std::cin >> x;
-    queue[q_r] = x;
-    ++q_r;
-    while (mn_l < mn_r && mins[mn_r - 1] > x) {
-      --mn_r;
+    queue_[q_r_] = x;
+    ++q_r_;
+    while (mn_l_ < mn_r_ && mins_[mn_r_ - 1] > x) {
+      --mn_r_;
     }
-    mins[mn_r] = x;
-    ++mn_r;
+    mins_[mn_r_] = x;
+    ++mn_r_;
     std::cout << "ok\n";
   }
 
@@ -43,11 +44,11 @@ struct SuperQueue {
       std::cout << "error\n";
       return;
     }
-    if (queue[q_l] == mins[mn_l]) {
-      ++mn_l;
+    if (queue_[q_l_] == mins_[mn_l_]) {
+      ++mn_l_;
     }
-    std::cout << queue[q_l] << "\n";
-    ++q_l;
+    std::cout << queue_[q_l_] << "\n";
+    ++q_l_;
   }
 
   void Front() const {
@@ -55,12 +56,12 @@ struct SuperQueue {
       std::cout << "error\n";
       return;
     }
-    std::cout << queue[q_l] << "\n";
+    std::cout << queue_[q_l_] << "\n";
   }
 
   void Clear() {
-    q_l = q_r = 0;
-    mn_l = mn_r = 0;
+    q_l_ = q_r_ = 0;
+    mn_l_ = mn_r_ = 0;
     std::cout << "ok\n";
   }
 
@@ -69,11 +70,12 @@ struct SuperQueue {
       std::cout << "error\n";
       return;
     }
-    std::cout << mins[mn_l] << "\n";
+    std::cout << mins_[mn_l_] << "\n";
   }
 };
 
 int main() {
+  std::ios_base::sync_with_stdio(false);
   std::cin.tie(0);
   std::cout.tie(0);
   SuperQueue curr_queue;
