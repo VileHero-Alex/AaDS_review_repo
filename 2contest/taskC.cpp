@@ -10,8 +10,6 @@ void SpeedUp() {
 class MyHeap {
  private:
   long long size_heap_ = 0;
-  const long long kSizeBox = (long long)1e5 + 100;
-  const long long kSizeReq = (long long)1e6 + 100;
   long long* heap_;
   long long* req_to_pos_;
   long long* pos_to_req_;
@@ -49,10 +47,10 @@ class MyHeap {
   }
 
  public:
-  MyHeap() {
-    heap_ = new long long[kSizeBox];
-    req_to_pos_ = new long long[kSizeReq];
-    pos_to_req_ = new long long[kSizeReq];
+  MyHeap(long long q) {
+    heap_ = new long long[q];
+    req_to_pos_ = new long long[q];
+    pos_to_req_ = new long long[q];
   }
   ~MyHeap() {
     delete[] heap_;
@@ -87,9 +85,9 @@ class MyHeap {
 };
 
 void Solve() {
-  MyHeap box;
   long long q;
   std::cin >> q;
+  MyHeap box(q + 1000);
   for (long long i = 1; i <= q; ++i) {
     std::string t;
     std::cin >> t;
