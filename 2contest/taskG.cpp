@@ -1,12 +1,14 @@
 #include <iostream>
 #include <vector>
 
-void StableSort(int n, std::vector<long long>& col, std::vector<int>& per) {
-  std::vector<int> cnt(256, 0), res(n);
+void StableSort(int n, std::vector<long long>& col,
+                std::vector<long long>& per) {
+  const long long kSz = 256;
+  std::vector<long long> cnt(kSz, 0), res(n);
   for (int i = 0; i < n; ++i) {
     ++cnt[col[per[i]]];
   }
-  for (int i = 0; i + 1 < 256; ++i) {
+  for (int i = 0; i + 1 < kSz; ++i) {
     cnt[i + 1] += cnt[i];
   }
   for (int i = n - 1; i >= 0; --i) {
@@ -16,27 +18,40 @@ void StableSort(int n, std::vector<long long>& col, std::vector<int>& per) {
   per = res;
 }
 
-void Solve() {
-  int n;
-  std::cin >> n;
-  std::vector<int> permutation(n);
+std::vector<long long> GetSort(std::vector<long long> a) {
+  const long long kDiv = 8;
+  int n = a.size();
+  std::vector<long long> permutation(n), quotient(n), column(n);
   for (int i = 0; i < n; ++i) {
     permutation[i] = i;
   }
-  std::vector<long long> a(n), quotient(n), column(n);
   for (int i = 0; i < n; ++i) {
-    std::cin >> a[i];
     quotient[i] = a[i];
   }
-  for (int i = 0; i < 8; ++i) {
+  for (int i = 0; i < kDiv; ++i) {
     for (int j = 0; j < n; ++j) {
-      column[j] = quotient[j] % 256;
-      quotient[j] /= 256;
+      column[j] = quotient[j] & ((1 << kDiv) - 1);
+      quotient[j] >>= kDiv;
     }
     StableSort(n, column, permutation);
   }
+  std::vector<long long> res(n);
   for (int i = 0; i < n; ++i) {
-    std::cout << a[permutation[i]] << "\n";
+    res[i] = a[permutation[i]];
+  }
+  return res;
+}
+
+void Solve() {
+  int n;
+  std::cin >> n;
+  std::vector<long long> a(n);
+  for (int i = 0; i < n; ++i) {
+    std::cin >> a[i];
+  }
+  std::vector<long long> ans = GetSort(a);
+  for (int i = 0; i < n; ++i) {
+    std::cout << ans[i] << "\n";
   }
 }
 
