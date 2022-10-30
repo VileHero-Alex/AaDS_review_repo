@@ -18,8 +18,8 @@ void StableSort(int n, std::vector<long long>& col,
   per = res;
 }
 
-std::vector<long long> GetSort(std::vector<long long> a) {
-  const long long kDiv = 8;
+void GetSort(std::vector<long long>& a) {
+  const long long kNumOfBytes = 8, kSz = 8;
   int n = a.size();
   std::vector<long long> permutation(n), quotient(n), column(n);
   for (int i = 0; i < n; ++i) {
@@ -28,10 +28,10 @@ std::vector<long long> GetSort(std::vector<long long> a) {
   for (int i = 0; i < n; ++i) {
     quotient[i] = a[i];
   }
-  for (int i = 0; i < kDiv; ++i) {
+  for (int i = 0; i < kSz; ++i) {
     for (int j = 0; j < n; ++j) {
-      column[j] = quotient[j] & ((1 << kDiv) - 1);
-      quotient[j] >>= kDiv;
+      column[j] = quotient[j] & ((1 << kNumOfBytes) - 1);
+      quotient[j] >>= kNumOfBytes;
     }
     StableSort(n, column, permutation);
   }
@@ -39,7 +39,7 @@ std::vector<long long> GetSort(std::vector<long long> a) {
   for (int i = 0; i < n; ++i) {
     res[i] = a[permutation[i]];
   }
-  return res;
+  a = res;
 }
 
 void Solve() {
@@ -49,9 +49,9 @@ void Solve() {
   for (int i = 0; i < n; ++i) {
     std::cin >> a[i];
   }
-  std::vector<long long> ans = GetSort(a);
+  GetSort(a);
   for (int i = 0; i < n; ++i) {
-    std::cout << ans[i] << "\n";
+    std::cout << a[i] << "\n";
   }
 }
 
