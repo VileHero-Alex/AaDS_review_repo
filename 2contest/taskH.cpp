@@ -3,15 +3,12 @@
 #include <random>
 #include <vector>
 
-int n;
-int data[(int)1e5 + 100];
-
 int Rnd(int lf, int rt) {
-  std::mt19937 rnd(std::chrono::steady_clock::now().time_since_epoch().count());
+  std::mt19937 rnd(13);
   return lf + rnd() % (rt - lf);
 }
 
-void QuickSort(int lf, int rt) {
+void QuickSort(int lf, int rt, std::vector<int>& data) {
   if (lf + 1 >= rt) {
     return;
   }
@@ -21,13 +18,13 @@ void QuickSort(int lf, int rt) {
       std::swap(data[i], data[pos++]);
     }
   }
-  QuickSort(lf, pos);
-  for (int i = pos; i < rt; i++) {
+  QuickSort(lf, pos, data);
+  for (int i = pos; i < rt; ++i) {
     if (data[i] == md) {
       std::swap(data[i], data[pos++]);
     }
   }
-  QuickSort(pos, rt);
+  QuickSort(pos, rt, data);
 }
 
 void SpeedUp() {
@@ -36,15 +33,14 @@ void SpeedUp() {
   std::ios_base::sync_with_stdio(false);
 }
 
-void Init() {
+void Solve() {
+  int n;
   std::cin >> n;
+  std::vector<int> data(n);
   for (int i = 0; i < n; ++i) {
     std::cin >> data[i];
   }
-}
-
-void Solve() {
-  QuickSort(0, n);
+  QuickSort(0, n, data);
   for (int i = 0; i < n; ++i) {
     std::cout << data[i] << " ";
   }
@@ -52,7 +48,6 @@ void Solve() {
 
 int main() {
   SpeedUp();
-  Init();
   Solve();
   return 0;
 }
