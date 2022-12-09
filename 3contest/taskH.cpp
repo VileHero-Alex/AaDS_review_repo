@@ -9,7 +9,7 @@ struct MyElement {
 class SparseTable {
  private:
   static const int kInf = static_cast<int>(1e9);
-  std::vector<int> lg_, myCopy_;
+  std::vector<int> myCopy_, lg_;
   std::vector<std::vector<MyElement>> table_;
 
   MyElement GetValToMerge(MyElement v1, MyElement v2);
@@ -70,16 +70,13 @@ MyElement SparseTable::GetValToMerge(MyElement v1, MyElement v2) {
   return {temp[0], temp[1]};
 }
 
-SparseTable::SparseTable(std::vector<int>& arr) {
+SparseTable::SparseTable(std::vector<int>& arr)
+    : myCopy_(arr), lg_(arr.size() + 1) {
   int n = static_cast<int>(arr.size());
-  lg_.assign(n + 1, 0);
-  myCopy_ = arr;
   for (int i = 2; i <= n; i++) {
     lg_[i] = lg_[i / 2] + 1;
   }
-  table_.assign(lg_[n] + 1,
-                std::vector<MyElement>(
-                    n, {static_cast<int>(kInf), static_cast<int>(kInf)}));
+  table_.assign(lg_[n] + 1, std::vector<MyElement>(n, {kInf, kInf}));
   for (int i = 0; i < n; ++i) {
     table_[0][i] = {i, static_cast<int>(kInf)};
   }
