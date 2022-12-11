@@ -9,26 +9,26 @@ void SpeedUp() {
   std::cout.tie(0);
 }
 
-namespace SIZE {
-int sz;
-}
-
 class SegmentTree {
  private:
+  int sz_;
   std::vector<int> tree_;
 
   int GetResOnSegment(int v, int l, int r, int val);
+  int GetAnswerForQueryDeveloperVersion(int ql, int val, int v,
+                                        std::pair<int, int> borders, int qr);
+  void UpdateDeveloperVersion(int v, int l, int r, int pos, int val);
+  void Build(int v, int l, int r, const std::vector<int>& a);
 
  public:
   static const int kINF = static_cast<int>(1e9);
 
-  SegmentTree(int sz) : tree_((std::__lg(sz) + 1) * sz) { SIZE::sz = sz; }
-
-  void Build(int v, int l, int r, const std::vector<int>& a);
-  void Update(int v, int l, int r, int pos, int val);
-  int GetAnswerForQuery(int ql, int val, int v = 1,
-                        std::pair<int, int> borders = {0, SIZE::sz},
-                        int qr = SIZE::sz);
+  SegmentTree(int n, const std::vector<int>& arr)
+      : sz_(n), tree_((std::__lg(n) + 1) * n) {
+    Build(1, 0, n, arr);
+  }
+  void Update(int pos, int val);
+  int GetAnswerForQuery(int ql, int val);
 };
 
 void Solve() {
@@ -38,14 +38,13 @@ void Solve() {
   for (int i = 0; i < n; ++i) {
     std::cin >> arr[i];
   }
-  SegmentTree tree(n);
-  tree.Build(1, 0, n, arr);
+  SegmentTree tree(n, arr);
   for (int i = 0; i < m; ++i) {
     int t, pos, x;
     std::cin >> t >> pos >> x;
     --pos;
     if (t == 0) {
-      tree.Update(1, 0, n, pos, x);
+      tree.Update(pos, x);
     } else {
       int ans = tree.GetAnswerForQuery(pos, x);
       if (ans == -tree.kINF) {
@@ -88,35 +87,47 @@ void SegmentTree::Build(int v, int l, int r, const std::vector<int>& a) {
   tree_[v] = std::max(tree_[2 * v], tree_[2 * v + 1]);
 }
 
-void SegmentTree::Update(int v, int l, int r, int pos, int val) {
+void SegmentTree::Update(int pos, int val) {
+  UpdateDeveloperVersion(1, 0, sz_, pos, val);
+}
+
+void SegmentTree::UpdateDeveloperVersion(int v, int l, int r, int pos,
+                                         int val) {
   if (l + 1 == r) {
     tree_[v] = val;
     return;
   }
   int md = (l + r) / 2;
   if (pos < md) {
-    Update(2 * v, l, md, pos, val);
+    UpdateDeveloperVersion(2 * v, l, md, pos, val);
   } else {
-    Update(2 * v + 1, md, r, pos, val);
+    UpdateDeveloperVersion(2 * v + 1, md, r, pos, val);
   }
   tree_[v] = std::max(tree_[2 * v], tree_[2 * v + 1]);
 }
 
-int SegmentTree::GetAnswerForQuery(int ql, int val, int v,
-                                   std::pair<int, int> borders, int qr) {
+int SegmentTree::GetAnswerForQuery(int ql, int val) {
+  return GetAnswerForQueryDeveloperVersion(ql, val, 1, {0, sz_}, sz_);
+}
+
+int SegmentTree::GetAnswerForQueryDeveloperVersion(int ql, int val, int v,
+                                                   std::pair<int, int> borders,
+                                                   int qr) {
   int l = borders.first, r = borders.second;
   if (ql == l && qr == r) {
     return GetResOnSegment(v, l, r, val);
   }
   int md = (l + r) / 2;
   if (ql < md) {
-    int res = GetAnswerForQuery(ql, val, 2 * v, {l, md}, std::min(qr, md));
+    int res = GetAnswerForQueryDeveloperVersion(ql, val, 2 * v, {l, md},
+                                                std::min(qr, md));
     if (res != -kINF) {
       return res;
     }
   }
   if (qr > md) {
-    int res = GetAnswerForQuery(std::max(ql, md), val, 2 * v + 1, {md, r}, qr);
+    int res = GetAnswerForQueryDeveloperVersion(std::max(ql, md), val,
+                                                2 * v + 1, {md, r}, qr);
     return res;
   }
   return -kINF;
