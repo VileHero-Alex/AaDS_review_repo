@@ -9,21 +9,21 @@ void SpeedUp() {
 
 class MyHashTable {
  private:
+  size_t sz_ = 1;
   std::vector<std::vector<long long>> table_;
   long long cnt_ = 0;
-  long long sz_ = 1;
   double RaiseConst_ = 0.75;
-  const long long kMagic1 = 838383, kMagic2 = 200720072;
+  const long long kConstForHash = 838383, kModForHash = 200720072;
 
  public:
-  MyHashTable() { table_.resize(sz_); }
+  MyHashTable() : table_(sz_) {}
 
   void Raisecnt() {
     ++cnt_;
     if (static_cast<double>(cnt_) / static_cast<double>(sz_) >= RaiseConst_) {
       sz_ *= 2;
       std::vector<std::vector<long long>> temp(sz_);
-      for (size_t i = 0; i < static_cast<size_t>(sz_ / 2); ++i) {
+      for (size_t i = 0; i < (sz_ / 2); ++i) {
         for (size_t j = 0; j < table_[i].size(); ++j) {
           long long x = table_[i][j];
           int new_hash = GetHash(x) % sz_;
@@ -34,9 +34,13 @@ class MyHashTable {
     }
   }
 
-  int GetHash(long long x) { return (x * kMagic1) % kMagic2; }
+  int GetHash(long long x) { return (x * kConstForHash) % kModForHash; }
 
   void Insert(long long x) {
+    if (Find(x)) {
+      return;
+    }
+    Raisecnt();
     int res = GetHash(x) % sz_;
     table_[res].push_back(x);
   }
@@ -52,6 +56,9 @@ class MyHashTable {
   }
 
   void Delete(long long x) {
+    if (!Find(x)) {
+      return;
+    }
     int res = GetHash(x) % sz_;
     size_t pos;
     for (pos = 0; pos < table_[res].size(); ++pos) {
@@ -73,22 +80,11 @@ void Solve() {
     long long x;
     std::cin >> t >> x;
     if (t == '+') {
-      if (box.Find(x)) {
-        continue;
-      }
-      box.Raisecnt();
       box.Insert(x);
     } else if (t == '-') {
-      if (!box.Find(x)) {
-        continue;
-      }
       box.Delete(x);
     } else {
-      if (box.Find(x)) {
-        std::cout << "YES\n";
-      } else {
-        std::cout << "NO\n";
-      }
+      box.Find(x) ? std::cout << "YES\n" : std::cout << "NO\n";
     }
   }
 }
