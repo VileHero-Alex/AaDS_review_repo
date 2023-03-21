@@ -1,43 +1,74 @@
 #include <iostream>
 #include <vector>
 
-int main() {
-  int n, m;
-  std::cin >> n >> m;
-  std::vector<int> w(n + 1), c(n + 1);
-  for (int i = 1; i <= n; ++i) {
-    std::cin >> w[i];
+class Knapsack {
+ private:
+  int n_, m_;
+  std::vector<int> w_, c_, res_;
+  std::vector<std::vector<int>> dp_, parent_;
+
+ public:
+  void Init() {
+    std::cin >> n_ >> m_;
+    dp_.assign(
+        2,
+        std::vector<int>(
+            m_ + 1,
+            -1));  // dp_[i][j] - максимальная стоимость предметов,
+                   // которые можно набрать среди первых i с суммарным весом j
+    parent_.assign(n_ + 1, std::vector<int>(m_ + 1, -1));
+    w_.resize(n_ + 1);
+    c_.resize(n_ + 1);
+    for (int i = 1; i <= n_; ++i) {
+      std::cin >> w_[i];
+    }
+    for (int i = 1; i <= n_; ++i) {
+      std::cin >> c_[i];
+    }
   }
-  for (int i = 1; i <= n; ++i) {
-    std::cin >> c[i];
-  }
-  std::vector<std::vector<int>> dp(n + 1, std::vector<int>(m + 1, -1));
-  std::vector<std::vector<int>> parent(n + 1, std::vector<int>(m + 1, -1));
-  dp[0][0] = 0;
-  for (int i = 1; i <= n; ++i) {
-    dp[i] = dp[i - 1];
-    for (int j = m - w[i]; j >= 0; --j) {
-      if (dp[i - 1][j] != -1 && dp[i][j + w[i]] < dp[i - 1][j] + c[i]) {
-        dp[i][j + w[i]] = std::max(dp[i][j + w[i]], dp[i - 1][j] + c[i]);
-        parent[i][j + w[i]] = i;
+
+  void Solve() {
+    dp_[0][0] = 0;
+    for (int i = 1; i <= n_; ++i) {
+      dp_[i % 2] = dp_[(i - 1) % 2];
+      for (int j = m_ - w_[i]; j >= 0; --j) {
+        if (dp_[(i - 1) % 2][j] != -1 &&
+            dp_[i % 2][j + w_[i]] < dp_[(i - 1) % 2][j] + c_[i]) {
+          dp_[i % 2][j + w_[i]] =
+              std::max(dp_[i % 2][j + w_[i]], dp_[(i - 1) % 2][j] + c_[i]);
+          parent_[i][j + w_[i]] = i;
+        }
+      }
+    }
+    int mx = 0, val = 0;
+    for (int i = 0; i <= m_; ++i) {
+      if (mx < dp_[n_ % 2][i]) {
+        mx = dp_[n_ % 2][i];
+        val = i;
+      }
+    }
+    while (val != 0) {
+      if (parent_[n_][val] == -1) {
+        --n_;
+      } else {
+        res_.push_back(parent_[n_][val]);
+        val -= w_[n_];
+        --n_;
       }
     }
   }
-  int mx = 0, val = 0;
-  for (int i = 0; i <= m; ++i) {
-    if (mx < dp[n][i]) {
-      mx = dp[n][i];
-      val = i;
+
+  void PrintRes() {
+    for (auto x : res_) {
+      std::cout << x << "\n";
     }
   }
-  while (val != 0) {
-    if (parent[n][val] == -1) {
-      --n;
-    } else {
-      std::cout << parent[n][val] << "\n";
-      val -= w[n];
-      --n;
-    }
-  }
+};
+
+int main() {
+  Knapsack my_knapsack;
+  my_knapsack.Init();
+  my_knapsack.Solve();
+  my_knapsack.PrintRes();
   return 0;
 }
