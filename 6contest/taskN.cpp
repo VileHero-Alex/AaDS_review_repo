@@ -3,8 +3,12 @@
 #include <string>
 #include <vector>
 
-int FindRes(std::string& a, std::string& b, int k, int sz_a, int sz_b) {
+int FindTheMinimumNumberOfPossiblePositionsISuchThatA_iNotEqB_iAfterKTransformations(const std::string& a, const std::string& b, int k) {
   std::vector<std::vector<std::vector<int>>> dp(2, std::vector<std::vector<int>>(k + 1, std::vector<int> (k + 1, 0)));
+
+  int sz_a = a.size();
+  int sz_b = b.size();
+
   int res = -1;
   for (int dl = 1; dl <= sz_b; ++dl) {
     for (int rem = 0; rem <= k && rem <= sz_a; ++rem) {
@@ -25,7 +29,9 @@ int FindRes(std::string& a, std::string& b, int k, int sz_a, int sz_b) {
       }
     }
   }
-
+  if (res != -1) {
+    return std::max(0, sz_b - res);
+  }
   return res;
 }
 
@@ -36,15 +42,8 @@ int main() {
   int k;
   std::cin >> a >> b >> k;
 
-  int sz_a = a.size();
-  int sz_b = b.size();
+  int ans = FindTheMinimumNumberOfPossiblePositionsISuchThatA_iNotEqB_iAfterKTransformations(a, b, k);
 
-  int ans = FindRes(a, b, k, sz_a, sz_b);
-
-  if (ans != -1) {
-    std::cout << std::max(0, sz_b - ans) << "\n";
-  } else {
-    std::cout << ans << "\n";
-  }
+  std::cout << ans << "\n";
   return 0;
 }
