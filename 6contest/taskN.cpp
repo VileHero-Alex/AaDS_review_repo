@@ -1,15 +1,16 @@
 #include <algorithm>
 #include <iostream>
-#include <string>
 #include <vector>
 
-int FindTheMinimumNumberOfPossiblePositionsISuchThatA_iNotEqB_iAfterKTransformations(const std::string& a, const std::string& b, int k) {
+const int kNoAns = -1;
+
+int FindMinNumOfPosAfterKTrans(const std::string& a, const std::string& b, int k) {
   std::vector<std::vector<std::vector<int>>> dp(2, std::vector<std::vector<int>>(k + 1, std::vector<int> (k + 1, 0)));
 
   int sz_a = a.size();
   int sz_b = b.size();
 
-  int res = -1;
+  int res = kNoAns;
   for (int dl = 1; dl <= sz_b; ++dl) {
     for (int rem = 0; rem <= k && rem <= sz_a; ++rem) {
       for (int add = 0; add + rem <= k && add <= dl; ++add) {
@@ -29,7 +30,7 @@ int FindTheMinimumNumberOfPossiblePositionsISuchThatA_iNotEqB_iAfterKTransformat
       }
     }
   }
-  if (res != -1) {
+  if (res != kNoAns) {
     return std::max(0, sz_b - res);
   }
   return res;
@@ -42,7 +43,7 @@ int main() {
   int k;
   std::cin >> a >> b >> k;
 
-  int ans = FindTheMinimumNumberOfPossiblePositionsISuchThatA_iNotEqB_iAfterKTransformations(a, b, k);
+  int ans = FindMinNumOfPosAfterKTrans(a, b, k);
 
   std::cout << ans << "\n";
   return 0;
