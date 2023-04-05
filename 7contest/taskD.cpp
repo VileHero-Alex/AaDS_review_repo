@@ -1,8 +1,5 @@
 #include <algorithm>
 #include <iostream>
-#include <map>
-#include <set>
-#include <string>
 #include <vector>
 
 void SpeedUp() {
@@ -17,45 +14,42 @@ class Graph {
   std::vector<int> used_, order_, comp_;
   std::vector<std::vector<int>> graph_, transp_;
 
-  void Dfs1(int v) {
+  void DfsForFindingTopSortOfGraph(int v) {
     used_[v] = 1;
     for (auto u : graph_[v]) {
       if (used_[u] == 0) {
-        Dfs1(u);
+        DfsForFindingTopSortOfGraph(u);
       }
     }
     order_.push_back(v);
   }
 
-  void Dfs2(int v) {
+  void DfsForDeterminingNoOfComponent(int v) {
     comp_[v] = cnt_;
     for (auto u : transp_[v]) {
       if (comp_[u] == 0) {
-        Dfs2(u);
+        DfsForDeterminingNoOfComponent(u);
       }
     }
   }
 
  public:
-  void Init() {
-    std::cin >> n_ >> m_;
-    graph_.resize(n_);
+  Graph(int n, int m, const std::vector<std::vector<int>>& graph)
+      : n_(n), m_(m), graph_(graph) {
     transp_.resize(n_);
     used_.resize(n_);
     comp_.resize(n_);
-    for (int i = 0; i < m_; ++i) {
-      int u, v;
-      std::cin >> u >> v;
-      --u, --v;
-      graph_[u].push_back(v);
-      transp_[v].push_back(u);
+    for (int i = 0; i < n_; ++i) {
+      for (auto u : graph_[i]) {
+        transp_[u].push_back(i);
+      }
     }
   }
 
   void TopSort() {
     for (int i = 0; i < n_; ++i) {
       if (used_[i] == 0) {
-        Dfs1(i);
+        DfsForFindingTopSortOfGraph(i);
       }
     }
     std::reverse(order_.begin(), order_.end());
@@ -64,13 +58,13 @@ class Graph {
   void Condensation() {
     for (auto u : order_) {
       if (comp_[u] == 0) {
-        Dfs2(u);
+        DfsForDeterminingNoOfComponent(u);
         ++cnt_;
       }
     }
   }
 
-  void GetRes() {
+  void PrintStrongCohesionComponents() {
     std::cout << cnt_ - 1 << "\n";
     for (int i = 0; i < n_; ++i) {
       std::cout << comp_[i] << " ";
@@ -81,10 +75,18 @@ class Graph {
 
 signed main() {
   SpeedUp();
-  Graph my_graph;
-  my_graph.Init();
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<std::vector<int>> graph(n);
+  for (int i = 0; i < m; ++i) {
+    int u, v;
+    std::cin >> u >> v;
+    --u, --v;
+    graph[u].push_back(v);
+  }
+  Graph my_graph(n, m, graph);
   my_graph.TopSort();
   my_graph.Condensation();
-  my_graph.GetRes();
+  my_graph.PrintStrongCohesionComponents();
   return 0;
 }
