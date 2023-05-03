@@ -8,36 +8,47 @@ void SpeedUp() {
   std::cout.tie(0);
 }
 
+struct Node {
+  int to;
+  int weight;
+};
+
+struct NodeCmp {
+  bool operator()(const Node& first, const Node& second) const {
+    if (first.weight != second.weight) {
+      return first.weight < second.weight;
+    }
+    return first.to < second.to;
+  }
+};
+
 class Graph {
  private:
-  const int kInf = 2009000999;
+  static constexpr const int kInf = 2009000999;
 
   int num_vert_;
-  std::vector<std::vector<std::pair<int, int>>> graph_;
+  std::vector<std::vector<Node>> graph_;
 
  public:
-  Graph(int num_vert,
-        const std::vector<std::vector<std::pair<int, int>>>& graph)
+  Graph(int num_vert, const std::vector<std::vector<Node>>& graph)
       : num_vert_(num_vert), graph_(graph) {}
 
   std::vector<int> Dijkstra(int start) const {
     std::vector<int> dist(num_vert_, kInf);
     dist[start] = 0;
-    std::set<std::pair<int, int>> pool;
-    pool.insert({dist[start], start});
+    std::set<Node, NodeCmp> pool;
+    pool.insert({start, dist[start]});
     while (!pool.empty()) {
-      int cur_v = (*pool.begin()).second;
-      int cur_d = (*pool.begin()).first;
+      int cur_v = (*pool.begin()).to;
+      int cur_d = (*pool.begin()).weight;
       pool.erase(pool.begin());
       if (cur_d > dist[cur_v]) {
         continue;
       }
-      for (auto elem : graph_[cur_v]) {
-        int to = elem.first;
-        int weight = elem.second;
+      for (auto [to, weight] : graph_[cur_v]) {
         if (dist[to] > dist[cur_v] + weight) {
           dist[to] = dist[cur_v] + weight;
-          pool.insert({dist[to], to});
+          pool.insert({to, dist[to]});
         }
       }
     }
@@ -49,7 +60,7 @@ void Solve() {
   int num_vert;
   int num_edj;
   std::cin >> num_vert >> num_edj;
-  std::vector<std::vector<std::pair<int, int>>> graph(num_vert);
+  std::vector<std::vector<Node>> graph(num_vert);
   for (int j = 0; j < num_edj; ++j) {
     int v1;
     int v2;
