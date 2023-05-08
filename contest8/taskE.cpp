@@ -14,25 +14,26 @@ struct Edge {
 
 class Graph {
  private:
-  const int kInf = 1'000'000'000;
-  const int kNoVal = -1;
+  static constexpr int kInf = 1'000'000'000;
+  static constexpr int kNoVal = -1;
   int num_vert_;
-  int num_edj_;
+  int num_edges_;
   std::vector<Edge> graph_;
   std::vector<int> path_;
 
  public:
-  Graph(int num_vert, int num_edj, const std::vector<Edge>& graph)
-      : num_vert_(num_vert), num_edj_(num_edj), graph_(graph) {}
+  Graph(int num_vert, const std::vector<Edge>& graph)
+      : num_vert_(num_vert), num_edges_(graph.size()), graph_(graph) {}
 
-  bool CheckForNegativeCycle(int start) {
+  bool CheckForNegativeCycle() {
+    int start = 0;
     std::vector<int> dist(num_vert_, kInf);
     dist[start] = 0;
-    std::vector<int> parent(num_vert_, kNoVal);
     int check = kNoVal;
+    std::vector<int> parent(num_vert_, kNoVal);
     for (int i = 0; i < num_vert_; ++i) {
       check = kNoVal;
-      for (int j = 0; j < num_edj_; ++j) {
+      for (int j = 0; j < num_edges_; ++j) {
         if (dist[graph_[j].v2] > dist[graph_[j].v1] + graph_[j].weight) {
           dist[graph_[j].v2] = std::min(dist[graph_[j].v2],
                                         dist[graph_[j].v1] + graph_[j].weight);
@@ -67,7 +68,7 @@ class Graph {
 };
 
 void Solve() {
-  const int kNoEdj = 100000;
+  const int kNoEdge = 100000;
   int num_vert;
   std::cin >> num_vert;
   std::vector<Edge> graph;
@@ -75,13 +76,13 @@ void Solve() {
     for (int j = 0; j < num_vert; ++j) {
       int weight;
       std::cin >> weight;
-      if (weight != kNoEdj) {
+      if (weight != kNoEdge) {
         graph.push_back({j, i, weight});
       }
     }
   }
-  Graph my_graph(num_vert, graph.size(), graph);
-  bool is_cycle = my_graph.CheckForNegativeCycle(0);
+  Graph my_graph(num_vert, graph);
+  bool is_cycle = my_graph.CheckForNegativeCycle();
   if (is_cycle) {
     std::cout << "YES\n";
     my_graph.PrintNegativeCycle();
