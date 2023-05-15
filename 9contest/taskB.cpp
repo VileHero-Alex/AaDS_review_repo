@@ -2,7 +2,7 @@
 #include <vector>
 #include <set>
 
-#define int long long 
+using ll = long long;
 
 void SpeedUp() {
   std::cin.tie(0);
@@ -11,21 +11,30 @@ void SpeedUp() {
 }
 
 struct Edge {
-  int to, weight;
+  ll to, weight;
+};
+
+struct EdgeCmp {
+  bool operator()(const Edge& first, const Edge& second) const {
+    if (first.weight != second.weight) {
+      return first.weight < second.weight;
+    }
+    return first.to < second.to;
+  }
 };
 
 class Graph {
  private:
-  int n_, m_;
-  int res_ = 0;
+  ll n_, m_;
+  ll res_ = 0;
   std::vector<std::vector<Edge>> graph_;
 
  public:
   void ReadData() {
     std::cin >> n_ >> m_;
     graph_.resize(n_);
-    for (int i = 0; i < m_; ++i) {
-      int u, v, w;
+    for (ll i = 0; i < m_; ++i) {
+      ll u, v, w;
       std::cin >> u >> v >> w;
       --u, --v;
       graph_[u].push_back({v, w});
@@ -34,16 +43,16 @@ class Graph {
   }
 
   void FindMST() {
-    std::set<std::pair<int, int>> pool;
-    std::vector<int> used(n_, 0);
+    std::set<Edge, EdgeCmp> pool;
+    std::vector<ll> used(n_, 0);
     for (auto [to, weight] : graph_[0]) {
-      pool.insert({weight, to});
+      pool.insert({to, weight});
     }
     used[0] = 1;
 
     while (!pool.empty()) {
-      int cur = (*pool.begin()).second;
-      int ed = (*pool.begin()).first;
+      ll cur = (*pool.begin()).to;
+      ll ed = (*pool.begin()).weight;
       pool.erase(pool.begin());
       if (used[cur] == 0) {
         res_ += ed;
@@ -51,7 +60,7 @@ class Graph {
       used[cur] = 1;
       for (auto [to, weight] : graph_[cur]) {
         if (!used[to]) {
-          pool.insert({weight, to});
+          pool.insert({to, weight});
         }
       }
     }
@@ -69,7 +78,7 @@ void Solve() {
   my_graph.PrintWeightOfMST();
 }
 
-signed main() {
+int main() {
   SpeedUp();
   Solve();
 }
